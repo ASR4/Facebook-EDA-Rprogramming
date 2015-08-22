@@ -1,0 +1,100 @@
+```{r}
+library(ggplot2)
+data(diamonds)
+```
+
+#price of all the diamond set 
+```{r}
+
+qplot(x = price, data = diamonds)
+```
+
+#diamond count
+```{r}
+sum(diamonds$price < 500)
+sum(diamonds$price < 250)
+sum(diamonds$price >= 15000)
+```
+
+
+```{r}
+qplot(x = price, data = diamonds, binwidth = 1)+ scale_x_continuous(limits = c(0, 1000), breaks = seq(0,1000,50))
+```
+
+# Break out the histogram of diamond prices by cut.
+```{r}
+qplot(x = price, data = diamonds, binwidth = 1)+facet_wrap(~cut) 
+  
+```
+
+
+```{r}
+by(diamonds$price,diamonds$cut,max)
+by(diamonds$price,diamonds$cut,summary)
+```
+
+```{r}
+qplot(x = price, data = diamonds, binwidth = 1) + facet_wrap(~cut , scales="free_y")
+
+```
+
+# Create a histogram of price per carat
+# and facet it by cut. You can make adjustments
+# to the code from the previous exercise to get
+# started.
+
+```{r}
+qplot(x = log10(price/carat), data = diamonds, binwidth = .1)+facet_wrap(~cut)
+
+```
+
+# Investigate the price of diamonds using box plots,
+# numerical summaries, and one of the following categorical
+# variables: cut, clarity, or color.
+```{r}
+qplot (x = cut ,y = price, data = diamonds, geom = 'boxplot')+
+  coord_cartesian(ylim = c(0, 8000))
+qplot (x = clarity ,y = price, data = diamonds, geom = 'boxplot')+
+  coord_cartesian(ylim = c(0, 8000))
+qplot (x = color ,y = price, data = diamonds, geom = 'boxplot')+
+  coord_cartesian(ylim = c(0,8000))
+qplot (x = color ,y = price, data = diamonds, geom = 'boxplot')+
+  scale_y_continuous(lim = c(0,8000), breaks = seq(0, 8000, 100))
+
+by(diamonds$price, diamonds$cut, summary)
+by(diamonds$price, diamonds$clarity, summary)
+by(diamonds$price, diamonds$color, summary)
+```
+
+
+```{r}
+by(diamonds$price,diamonds$color, summary)
+value_1 <- IQR(subset(diamonds, color == 'D')$color)
+IQR(subset(diamonds, color == 'J')$color)
+```
+
+# Investigate the price per carat of diamonds across
+# the different colors of diamonds using boxplots.
+
+```{r}
+qplot (x = color ,y = price/carat, data = diamonds, geom = 'boxplot')+
+  coord_cartesian(ylim = c(0, 8000))
+```
+
+#Carat using a frequency polygon
+```{r}
+qplot (x = carat, data = diamonds,
+       binwidth = .1, geom = 'freqpoly')+ scale_x_continuous(lim = c(0,5), breaks = seq(0, 5, .1))
+
+by(sum(diamonds),diamonds$carat, summary)
+
+```
+
+# The Gapminder website contains over 500 data sets with information about
+# the world's population. Your task is to download a data set of your choice
+# and create 2-5 plots that make use of the techniques from Lesson 3.
+
+```{r}
+af <- read.csv('Agriculture.xlsx')
+
+```

@@ -1,0 +1,139 @@
+```{r}
+getwd()
+setwd('C:/Users/Ashmeet/Desktop/Udacity/')
+list.files()
+pf <- read.csv('pseudo_facebook.tsv', sep = '\t')
+names(pf)
+library(ggplot2)
+qplot(x = dob_day, data = pf) +
+  scale_x_discrete(breaks=1:31) +
+  facet_wrap(~dob_month, ncol = 3)
+```
+```{r}
+ggplot(data = pf, aes(x = dob_day)) + 
+  geom_histogram() + 
+  scale_x_discrete(breaks = 1:31) + 
+  facet_wrap(~dob_month)
+
+```
+```{r}
+qplot(x = friend_count, data = pf,xlim = c(0, 1000))
+
+qplot(x = friend_count, data = subset(pf, !is.na(gender)), binwidth = 25) + 
+  scale_x_continuous(limits = c(0, 1000), breaks = seq(0,1000,50))+
+facet_wrap(~gender,  ncol=2)
+```
+```{r}
+qplot(x = friend_count, data = pf) + 
+  facet_grid(gender ~ .)
+
+```
+```{r}
+table(pf$gender)
+by(pf$friend_count, pf$gender, summary)
+```
+
+```{r}
+qplot(x = tenure, data = pf, binwidth = 30, color = I('black'), fill = I('#099DD9'))
+```
+
+```{r}
+qplot(x = tenure/365, data = pf,
+      xlab = 'Number of years using Facebook',
+      ylab = 'Number of users in sample',
+      binwidth = .25, color = I('black'),     fill = I('orange')) + scale_x_continuous(breaks = seq(1,7,1), limits   = c(0, 7))
+```
+
+```{r}
+qplot(x = age, data = pf, binwidth = 1, color = I('black'), fill =      I('green')) + scale_x_discrete(breaks = seq(1, 150, 1), limits = c(0, 150))
+
+```
+```{r}
+qplot(x = age, data = pf, binwidth = 1, color = I('black'), fill =      I('green'))
+```
+
+#Making multiple graphs with different x-axis
+```{r}
+install.packages('gridExtra')
+library(gridExtra)
+
+p1 <- qplot(x = friend_count, data = pf)
+p2 <- qplot(x = log10(friend_count + 1), data = pf)
+p3 <- qplot(x = sqrt(friend_count), data = pf)
+
+grid.arrange(p1, p2, p3, ncol=1)
+```
+
+```{r}
+p1 <- ggplot(aes(x = friend_count), data = pf) + geom_histogram()
+p2 <- p1 + scale_x_log10()
+p3 <- p1 + scale_x_sqrt()
+grid.arrange(p1, p2, p3, ncol=1)
+```
+
+#Frequency polygon
+```{r}
+qplot(x = friend_count, data = subset(pf, !is.na(gender)), binwidth = 10) + scale_x_continuous(lim = c(0, 1000), breaks = seq(0, 1000, 50)) + facet_wrap(~gender)
+
+qplot(x = friend_count,y = ..count../sum(..count..), 
+      data = subset(pf, !is.na(gender)),
+      xlab = 'Friend Count',
+      ylab = 'Proportion of Users with that friend count',
+      binwidth = 10, geom = 'freqpoly', color = gender) + scale_x_continuous(lim = c(0, 1000), breaks = seq(0, 1000, 50))
+
+```
+
+#Which gender makes more likes count on the www
+
+```{r}
+qplot(x = www_likes,
+      data = subset(pf, !is.na(gender)),
+      xlab = 'Likes Count',
+      ylab = 'Proportion of Users with that like count',
+      geom = 'freqpoly', color = gender) + scale_x_continuous() + scale_x_log10()
+
+```
+
+# To find www_likes over gender
+```{r}
+by(pf$www_likes, pf$gender, sum)
+```
+
+#box plot                                                             
+```{r}
+qplot (x = gender, y = friend_count, data = subset(pf, !is.na(gender)), geom = 'boxplot') + scale_y_discrete(lim = c(0,1000),breaks = seq(0, 1000, 50))
+
+qplot (x = gender, y = friend_count, data = subset(pf, !is.na(gender)), geom = 'boxplot') + coord_cartesian(ylim = c(0, 250))
+
+by(pf$friend_count, pf$gender, summary)
+```
+
+#who initiated more friendships
+```{r}
+qplot (x = gender, y = friendships_initiated, data = subset(pf, !is.na(gender)), geom = 'boxplot') + coord_cartesian(ylim = c(0, 250))
+
+```
+
+#Getting logical
+```{r}
+summary(pf$mobile_likes)
+summary(pf$mobile_likes > 0)
+#making new variable
+pf$mobile_check_in <- NA
+pf$mobile_check_in <- ifelse(pf$mobile_likes > 0,1,0)
+pf$mobile_check_in <- factor(pf$mobile_check_in)
+summary(pf$mobile_check_in)
+```
+
+#percent of people doing mobile check ins'
+```{r}
+
+sum(pf$mobile_check_in == 1)/length(pf$mobile_check_in)
+```
+
+
+
+
+
+
+

@@ -1,0 +1,121 @@
+```{r}
+getwd()
+setwd('C:/Users/Ashmeet/Desktop/Udacity/')
+library(ggplot2)
+```
+
+```{r}
+ggplot(aes(x = price, y = x), data = diamonds) + geom_point()
+```
+
+```{r}
+cor.test(diamonds$x, diamonds$price, method = 'pearson')
+cor.test(diamonds$y, diamonds$price, method = 'pearson')
+cor.test(diamonds$z, diamonds$price, method = 'pearson')
+
+```
+
+```{r}
+ggplot(aes(x = price, y = depth), data = diamonds) + geom_point(alpha = 1/100) + scale_x_continuous(breaks = seq(0,10000,2))
+```
+
+#depth vs price correlation
+```{r}
+cor.test(diamonds$depth, diamonds$price, method = 'pearson')
+
+```
+
+```{r}
+ggplot(aes(x = price, y = carat), data = diamonds) +
+  geom_point(stat = 'summary', fun.y = quantile, fun.x = quantile, probs = .01, color = 'blue')
+
+```
+
+```{r}
+volume <- diamonds$x * diamonds$y * diamonds$z
+ggplot(aes(x = price, y = volume), data = diamonds) +
+  geom_point(alpha = 1/20) + coord_cartesian(xlim = c(0, 20000),ylim = c(0, 1000))
+
+```
+
+#detach cause at time the 'dplyr' function does not work well with the 'plyr' function attached
+```{r}
+install.packages('plyr')
+library(plyr)
+d <- count(diamonds$volume == 0)
+detach("package:plyr", unload=TRUE)
+```
+
+```{r}
+#adding variable to a data set.
+diamonds$volume <- diamonds$x * diamonds$y * diamonds$z
+
+new_diamonds <- subset(diamonds, (volume > 0 && volume < 800))
+
+
+cor.test(new_diamonds$price, new_diamonds$volume, method = 'pearson')
+
+```
+
+```{r}
+ggplot(aes(x = price, y = volume), data = new_diamonds) +
+  geom_point(alpha = 1/20) +
+  geom_smooth(method = 'lm', color = 'red') + coord_cartesian(xlim = c(0, 20000),ylim = c(0, 1000))
+```
+
+```{r}
+library(dplyr)
+diamonds_Clarity <- group_by(diamonds, clarity)
+
+diamondsByClarity <- summarise(diamonds_Clarity, 
+          mean_price = mean(price),
+          median_price = median(as.numeric(price)),
+          min_price = min(price),
+          max_price = max(price),
+          n = n())
+diamondsByClarity <- arrange(diamondsByClarity,clarity)
+
+head(diamondsByClarity,8)
+
+#alternate method using%.%
+diamondsByClarity <- diamonds %>%
+  group_by(Clarity)%>%
+  summarise(mean_price =mean(price),
+            median_price = median(as.numeric(price)),
+            min_price = min(price),
+            max_price = max(price),
+            n = n())%>%
+  
+  arrange(Clarity)
+
+```
+
+
+```{r}
+diamonds_by_clarity <- group_by(diamonds, clarity)
+diamonds_mp_by_clarity <- summarise(diamonds_by_clarity, mean_price = mean(price))
+
+diamonds_by_color <- group_by(diamonds, color)
+diamonds_mp_by_color <- summarise(diamonds_by_color, mean_price = mean(price))
+
+diamonds_by_cut <- group_by(diamonds, cut)
+diamonds_mp_by_cut <- summarise(diamonds_by_cut, mean_price = mean(price))
+
+p1 <- barplot(diamonds_mp_by_clarity$mean_price,
+        names.arg = diamonds_mp_by_clarity$clarity,
+        main = "Diamond Prices by Clarity")
+
+p2 <- barplot(diamonds_mp_by_color$mean_price,
+        names.arg = diamonds_mp_by_color$color,
+        main = "Diamond Prices by Color")
+
+p1 <- barplot(diamonds_mp_by_cut$mean_price,
+        names.arg = diamonds_mp_by_cut$cut,
+        main = "Diamond Prices by Cut")
+
+library(gridExtra)
+grid.arrange(p2, p1, ncol = 1)
+
+```
+
+
